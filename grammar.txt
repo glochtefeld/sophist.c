@@ -1,0 +1,23 @@
+args = flags* rest?
+flags = flaglist | namedarglist
+flaglist = sflag+
+sflag = "-"? ALPHANUM
+lflag = "--" NONDASHSTRING
+namedarglist = namedarg+
+namedarg = lflag "="? NONDASHSTRING?
+
+rest = rest-sep? restlist
+rest-sep = " -- "
+restlist = ( STRING " " )*
+
+STRING = .+\0
+NONDASHSTRING = [^-].*\0
+ALPHANUM = [a-zA-Z0-9]
+
+; Complicated example:
+; prog -abc123 --test --test-2 value -d -e -F --g-test -- hello world
+; prog --long --test-1 value -abc123 --test -d -e -F --g-test hello world
+
+; Note that --g-test in this example does not take any arguments.
+; 1 args are equivalent to -a -b -c -d -e -F -1 -2 -3 --test --g-test --test-2=value rest=["hello", "world"]
+; 2 args are equivalent to -a -b -c -d -e -F -1 -2 -3 --test --long --g-test --test-1=value rest=["hello", "world"]
